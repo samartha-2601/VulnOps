@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
+import Layout from "../components/Layout";
 
 export default function SubmitReport() {
   const navigate = useNavigate();
@@ -12,79 +13,118 @@ export default function SubmitReport() {
   const [impact, setImpact] = useState("");
   const [asset, setAsset] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
 
-    await api.post("/reports", {
-      title,
-      description,
-      steps,
-      impact,
-      asset,
-    });
+    try {
+      await api.post("/reports", {
+        title,
+        description,
+        steps,
+        impact,
+        asset,
+      });
 
-    navigate("/");
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Submit Vulnerability Report</h1>
+    <Layout>
+      <div className="mx-auto max-w-3xl">
+        <h1 className="mb-8 text-4xl font-bold">
+          Submit Vulnerability Report
+        </h1>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <input
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Title
+            </label>
 
-        <br />
+            <input
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-white"
+              value={title}
+              onChange={(e) =>
+                setTitle(e.target.value)
+              }
+            />
+          </div>
 
-        <div>
-          <textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Description
+            </label>
 
-        <br />
+            <textarea
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-white"
+              rows={4}
+              value={description}
+              onChange={(e) =>
+                setDescription(e.target.value)
+              }
+            />
+          </div>
 
-        <div>
-          <textarea
-            placeholder="Steps"
-            value={steps}
-            onChange={(e) => setSteps(e.target.value)}
-          />
-        </div>
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Steps To Reproduce
+            </label>
 
-        <br />
+            <textarea
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-white"
+              rows={4}
+              value={steps}
+              onChange={(e) =>
+                setSteps(e.target.value)
+              }
+            />
+          </div>
 
-        <div>
-          <textarea
-            placeholder="Impact"
-            value={impact}
-            onChange={(e) => setImpact(e.target.value)}
-          />
-        </div>
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Impact
+            </label>
 
-        <br />
+            <textarea
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-white"
+              rows={3}
+              value={impact}
+              onChange={(e) =>
+                setImpact(e.target.value)
+              }
+            />
+          </div>
 
-        <div>
-          <input
-            placeholder="Asset"
-            value={asset}
-            onChange={(e) => setAsset(e.target.value)}
-          />
-        </div>
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Asset
+            </label>
 
-        <br />
+            <input
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-white"
+              value={asset}
+              onChange={(e) =>
+                setAsset(e.target.value)
+              }
+            />
+          </div>
 
-        <button type="submit">
-          Submit Report
-        </button>
-      </form>
-    </div>
+          <button
+            type="submit"
+            className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
+          >
+            Submit Report
+          </button>
+        </form>
+      </div>
+    </Layout>
   );
 }

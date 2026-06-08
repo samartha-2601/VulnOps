@@ -23,7 +23,31 @@ def get_reports(
 
     reports = db.query(Report).all()
 
-    return reports
+    results = []
+
+    for report in reports:
+
+        analysis = (
+            db.query(Analysis)
+            .filter(
+                Analysis.report_id == report.id
+            )
+            .first()
+        )
+
+        results.append(
+            {
+                "id": report.id,
+                "title": report.title,
+                "description": report.description,
+                "severity":
+                    analysis.severity
+                    if analysis
+                    else "Unknown"
+            }
+        )
+
+    return results
 
 
 @router.post("/reports")

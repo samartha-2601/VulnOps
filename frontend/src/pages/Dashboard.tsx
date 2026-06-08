@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
-import api from "../services/api";
 import { Link } from "react-router-dom";
+
+import api from "../services/api";
+
+import Layout from "../components/Layout";
+import StatsCard from "../components/StatsCard";
+import SeverityBadge from "../components/SeverityBadge";
 
 interface Report {
   id: number;
   title: string;
   description: string;
+  severity: string
 }
 
 export default function Dashboard() {
@@ -25,41 +31,98 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>VulnOps Dashboard</h1>
+    <Layout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-4xl font-bold">
+            Vulnerability Dashboard
+          </h1>
 
+          <p className="mt-2 text-slate-400">
+            AI-powered bug bounty triage platform
+          </p>
+        </div>
 
-      <Link
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatsCard
+            title="Total Reports"
+            value={reports.length}
+          />
+
+          <StatsCard
+            title="Critical Findings"
+            value={
+                reports.filter((r) => r.severity === "Critical").length
+            }
+          />
+
+          <StatsCard
+            title="High Severity"
+            value={
+                reports.filter((r) => r.severity === "High").length
+            }
+          />
+        </div>
+
+        
+
+        <div className="flex justify-end">
+            
+          <Link
             to="/submit"
-            style={{
-                display: "inline-block",
-                marginBottom: "20px",
-            }}
-            >
-            Submit New Report
-        </Link>
+            className="
+              rounded-lg
+              bg-blue-600
+              px-4
+              py-2
+              font-medium
+              text-white
+              hover:bg-blue-700
+            "
+          >
+            Submit Report
+          </Link>
+          
+        </div>
 
-      {reports.map((report) => (
-        <Link
-            key={report.id}
-            to={`/reports/${report.id}`}
-            style={{
-                textDecoration: "none",
-                color: "inherit",
-            }}
+        
+
+        <div className="space-y-4">
+          {reports.map((report) => (
+            <Link
+              key={report.id}
+              to={`/reports/${report.id}`}
             >
-            <div
-                style={{
-                border: "1px solid gray",
-                marginTop: "10px",
-                padding: "10px",
-                }}
-            >
-                <h3>{report.title}</h3>
-                <p>{report.description}</p>
-            </div>
+              <div
+                className="
+                  rounded-xl
+                  border
+                  border-slate-800
+                  bg-slate-900
+                  p-6
+                  transition
+                  hover:border-blue-500
+                  hover:bg-slate-800
+                "
+              >
+                <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold">
+                        {report.title}
+                    </h2>
+
+                    <SeverityBadge
+                        severity={report.severity}
+                    />
+                </div>
+
+                <p className="mt-2 text-slate-400">
+                  {report.description}
+                </p>
+              </div>
             </Link>
-      ))}
-    </div>
+          ))}
+        </div>
+      </div>
+    </Layout>
   );
 }
