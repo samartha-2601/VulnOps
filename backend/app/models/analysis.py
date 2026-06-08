@@ -4,6 +4,7 @@ from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy import ForeignKey
 from sqlalchemy import DateTime
+from sqlalchemy.orm import relationship
 
 from datetime import datetime
 
@@ -27,6 +28,8 @@ class Analysis(Base):
     root_cause = Column(Text)
 
     remediation = Column(Text)
+
+    report = relationship("Report")
 
     created_at = Column(
         DateTime,

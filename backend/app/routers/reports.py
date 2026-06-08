@@ -16,6 +16,16 @@ from app.services.openai_service import classify_vulnerability
 router = APIRouter()
 
 
+@router.get("/reports")
+def get_reports(
+    db: Session = Depends(get_db)
+):
+
+    reports = db.query(Report).all()
+
+    return reports
+
+
 @router.post("/reports")
 def create_report(
     report: ReportCreate,
@@ -75,4 +85,47 @@ Asset:
         "severity": analysis.severity,
         "root_cause": analysis.root_cause,
         "remediation": analysis.remediation
+    }
+
+
+@router.get("/reports/{report_id}")
+def get_report_details(
+    report_id: int,
+    db: Session = Depends(get_db)
+):
+
+    report = (
+        db.query(Report)
+        .filter(Report.id == report_id)
+        .first()
+    )
+
+    if not report:
+        return {
+            "error": "Report not found"
+        }
+
+    analysis = (
+        db.query(Analysis)
+        .filter(
+            Analysis.report_id == report_id
+        )
+        .first()
+    )
+
+    return {
+        "report": {
+            "id": report.id,
+            "title": report.title,
+            "description": report.description,
+            "steps": report.steps,
+            "impact": report.impact,
+            "asset": report.asset
+        },
+        "analysis": {
+            "vulnerability_type": analysis.vulnerability_type if analysis else None,
+            "severity": analysis.severity if analysis else None,
+            "root_cause": analysis.root_cause if analysis else None,
+            "remediation": analysis.remediation if analysis else None
+        }
     }
