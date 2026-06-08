@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 import api from "../services/api";
 import Layout from "../components/Layout";
+import SeverityBadge from "../components/SeverityBadge";
 
 export default function ReportDetails() {
   const { id } = useParams();
@@ -42,10 +43,37 @@ export default function ReportDetails() {
             Severity
           </h2>
 
-          <p className="text-2xl font-bold">
-            {data.analysis.severity}
-          </p>
+          <div className="mt-2">
+            <SeverityBadge
+                severity={data.analysis.severity}
+            />
+          </div>
         </div>
+
+
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
+                <h2 className="mb-2 text-lg font-semibold text-slate-300">
+                CWE
+                </h2>
+
+                <p className="text-xl font-bold">
+                {data.analysis.cwe}
+                </p>
+            </div>
+
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
+                <h2 className="mb-2 text-lg font-semibold text-slate-300">
+                OWASP
+                </h2>
+
+                <p className="text-xl font-bold">
+                {data.analysis.owasp}
+                </p>
+            </div>
+        </div>
+
+
 
         <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
           <h2 className="mb-3 text-lg font-semibold text-slate-300">

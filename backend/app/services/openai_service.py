@@ -27,9 +27,39 @@ Return this exact structure:
 {
   "vulnerability_type": "",
   "severity": "",
+  "cwe": "",
+  "owasp": "",
   "root_cause": "",
   "remediation": ""
 }
+
+Map common vulnerabilities to CWE and OWASP categories.
+
+Examples:
+
+SQL Injection:
+- CWE-89
+- A03:2021 Injection
+
+Stored XSS:
+- CWE-79
+- A03:2021 Injection
+
+Reflected XSS:
+- CWE-79
+- A03:2021 Injection
+
+SSRF:
+- CWE-918
+- A10:2021 SSRF
+
+IDOR:
+- CWE-639
+- A01:2021 Broken Access Control
+
+CSRF:
+- CWE-352
+- A01:2021 Broken Access Control
 
 Severity must be one of:
 

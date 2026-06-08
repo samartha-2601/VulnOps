@@ -25,6 +25,10 @@ class Analysis(Base):
 
     severity = Column(String)
 
+    cwe = Column(String)
+
+    owasp = Column(String)
+
     root_cause = Column(Text)
 
     remediation = Column(Text)

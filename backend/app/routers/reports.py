@@ -92,6 +92,8 @@ Asset:
         report_id=new_report.id,
         vulnerability_type=ai_result["vulnerability_type"],
         severity=ai_result["severity"],
+        cwe=ai_result["cwe"],
+        owasp=ai_result["owasp"],
         root_cause=ai_result["root_cause"],
         remediation=ai_result["remediation"]
     )
@@ -107,6 +109,8 @@ Asset:
         "analysis_id": analysis.id,
         "vulnerability_type": analysis.vulnerability_type,
         "severity": analysis.severity,
+        "cwe": analysis.cwe,
+        "owasp": analysis.owasp,
         "root_cause": analysis.root_cause,
         "remediation": analysis.remediation
     }
@@ -149,6 +153,8 @@ def get_report_details(
         "analysis": {
             "vulnerability_type": analysis.vulnerability_type if analysis else None,
             "severity": analysis.severity if analysis else None,
+            "cwe": analysis.cwe if analysis else None,
+            "owasp": analysis.owasp if analysis else None,
             "root_cause": analysis.root_cause if analysis else None,
             "remediation": analysis.remediation if analysis else None
         }
