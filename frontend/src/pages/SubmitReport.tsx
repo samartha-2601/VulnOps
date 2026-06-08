@@ -12,6 +12,7 @@ export default function SubmitReport() {
   const [steps, setSteps] = useState("");
   const [impact, setImpact] = useState("");
   const [asset, setAsset] = useState("");
+  const [duplicate, setDuplicate] = useState<any>(null);
 
   const handleSubmit = async (
     e: React.FormEvent
@@ -19,15 +20,28 @@ export default function SubmitReport() {
     e.preventDefault();
 
     try {
-      await api.post("/reports", {
-        title,
-        description,
-        steps,
-        impact,
-        asset,
-      });
+      const response = await api.post(
+        "/reports",
+        {
+            title,
+            description,
+            steps,
+            impact,
+            asset,
+        }
+        );
 
-      navigate("/");
+        if (
+        response.data.duplicate_found
+        ) {
+        setDuplicate(
+            response.data.existing_report
+        );
+
+        return;
+        }
+
+        navigate("/");
     } catch (error) {
       console.error(error);
     }
@@ -39,6 +53,53 @@ export default function SubmitReport() {
         <h1 className="mb-8 text-4xl font-bold">
           Submit Vulnerability Report
         </h1>
+
+
+        {
+            duplicate && (
+                <div
+                className="
+                mb-6
+                rounded-xl
+                border
+                border-yellow-500
+                bg-yellow-500/10
+                p-6
+                "
+                >
+                <h2
+                    className="
+                    text-xl
+                    font-bold
+                    text-yellow-400
+                "
+                >
+                    Potential Duplicate Found
+                </h2>
+
+                <p className="mt-2">
+                    {duplicate.metadata.title}
+                </p>
+
+                <p className="mt-2">
+                    Severity:
+                    {" "}
+                    {duplicate.metadata.severity}
+                </p>
+
+                <p className="mt-2">
+                    Similarity:
+                    {" "}
+                    {(
+                    (1 -
+                        duplicate.distance) *
+                    100
+                    ).toFixed(1)}
+                    %
+                </p>
+                </div>
+            )
+            }
 
         <form
           onSubmit={handleSubmit}

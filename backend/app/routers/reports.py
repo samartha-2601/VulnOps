@@ -6,12 +6,18 @@ from sqlalchemy.orm import Session
 from app.dependencies import get_db
 
 from app.models.report import Report
+from app.models.analysis import Analysis
 
 from app.schemas.report import ReportCreate
 
-from app.models.analysis import Analysis
-
 from app.services.openai_service import classify_vulnerability
+
+from app.services.embedding_service import generate_embedding
+
+from app.services.vector_service import (
+    add_report_embedding,
+    check_for_duplicate
+)
 
 router = APIRouter()
 
@@ -56,22 +62,9 @@ def create_report(
     db: Session = Depends(get_db)
 ):
 
-    new_report = Report(
-        title=report.title,
-        description=report.description,
-        steps=report.steps,
-        impact=report.impact,
-        asset=report.asset
-    )
-
-    db.add(new_report)
-
-    db.commit()
-
-    db.refresh(new_report)
-
     report_text = f"""
-Title: {report.title}
+Title:
+{report.title}
 
 Description:
 {report.description}
@@ -86,7 +79,38 @@ Asset:
 {report.asset}
 """
 
-    ai_result = classify_vulnerability(report_text)
+    embedding = generate_embedding(
+        report_text
+    )
+
+    duplicate = check_for_duplicate(
+        embedding
+    )
+
+    if duplicate:
+
+        return {
+            "duplicate_found": True,
+            "existing_report": duplicate
+        }
+
+    new_report = Report(
+        title=report.title,
+        description=report.description,
+        steps=report.steps,
+        impact=report.impact,
+        asset=report.asset
+    )
+
+    db.add(new_report)
+
+    db.commit()
+
+    db.refresh(new_report)
+
+    ai_result = classify_vulnerability(
+        report_text
+    )
 
     analysis = Analysis(
         report_id=new_report.id,
@@ -104,7 +128,18 @@ Asset:
 
     db.refresh(analysis)
 
+    add_report_embedding(
+        report_id=str(new_report.id),
+        embedding=embedding,
+        metadata={
+            "title": new_report.title,
+            "severity": analysis.severity,
+            "asset": new_report.asset
+        }
+    )
+
     return {
+        "duplicate_found": False,
         "report_id": new_report.id,
         "analysis_id": analysis.id,
         "vulnerability_type": analysis.vulnerability_type,
@@ -151,11 +186,22 @@ def get_report_details(
             "asset": report.asset
         },
         "analysis": {
-            "vulnerability_type": analysis.vulnerability_type if analysis else None,
-            "severity": analysis.severity if analysis else None,
-            "cwe": analysis.cwe if analysis else None,
-            "owasp": analysis.owasp if analysis else None,
-            "root_cause": analysis.root_cause if analysis else None,
-            "remediation": analysis.remediation if analysis else None
+            "vulnerability_type":
+                analysis.vulnerability_type if analysis else None,
+
+            "severity":
+                analysis.severity if analysis else None,
+
+            "cwe":
+                analysis.cwe if analysis else None,
+
+            "owasp":
+                analysis.owasp if analysis else None,
+
+            "root_cause":
+                analysis.root_cause if analysis else None,
+
+            "remediation":
+                analysis.remediation if analysis else None
         }
     }
