@@ -20,6 +20,4 @@ which executes when another user views the note.
 
     result = classify_vulnerability(sample_report)
 
-    return {
-        "analysis": result
-    }
+    return result

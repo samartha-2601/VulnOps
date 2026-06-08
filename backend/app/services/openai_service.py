@@ -1,3 +1,5 @@
+import json
+
 from openai import OpenAI
 
 from app.config import settings
@@ -11,17 +13,31 @@ def classify_vulnerability(report_text: str):
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
+        response_format={"type": "json_object"},
         messages=[
             {
                 "role": "system",
                 "content": """
-You are a cybersecurity analyst.
+You are an expert security analyst.
 
-Analyze the vulnerability report and return:
+Analyze the vulnerability report and return ONLY valid JSON.
 
-1. Vulnerability Type
-2. Severity
-3. Brief Explanation
+Return this exact structure:
+
+{
+  "vulnerability_type": "",
+  "severity": "",
+  "root_cause": "",
+  "remediation": ""
+}
+
+Severity must be one of:
+
+Critical
+High
+Medium
+Low
+Informational
 """
             },
             {
@@ -31,4 +47,6 @@ Analyze the vulnerability report and return:
         ]
     )
 
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+
+    return json.loads(content)
